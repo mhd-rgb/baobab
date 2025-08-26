@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一个小小的玩笑</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- 配置Tailwind自定义颜色和字体 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        love: {
+                            pink: '#FF7EB3',
+                            red: '#FF3A6E',
+                            dark: '#C82E5C',
+                            light: '#FFD1DC'
+                        },
+                        prank: {
+                            yellow: '#FFD166',
+                            blue: '#118AB2',
+                            gray: '#6B7280'
+                        }
+                    },
+                    fontFamily: {
+                        romantic: ['Dancing Script', 'cursive'],
+                        main: ['Montserrat', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            }
+            .heart-beat {
+                animation: heartbeat 1.5s ease-in-out infinite;
+            }
+            .float {
+                animation: float 3s ease-in-out infinite;
+            }
+            .fade-in {
+                animation: fadeIn 1.5s ease-in forwards;
+            }
+            .slide-up {
+                animation: slideUp 1s ease-out forwards;
+            }
+            .scale-in {
+                animation: scaleIn 0.8s ease-out forwards;
+            }
+            .bg-blur {
+                backdrop-filter: blur(8px);
+            }
+            .spin-slow {
+                animation: spin 8s linear infinite;
+            }
+        }
+        
+        /* 动画定义 */
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            14% { transform: scale(1.1); }
+            28% { transform: scale(1); }
+            42% { transform: scale(1.1); }
+            70% { transform: scale(1); }
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+    
+    <!-- 引入Google字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="font-main bg-gradient-to-br from-pink-50 to-purple-50 min-h-screen overflow-x-hidden">
+    <!-- 背景装饰元素 -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="absolute top-10 left-10 w-20 h-20 text-love-pink/20 heart-beat">
+            <i class="fa fa-heart text-[8rem]"></i>
+        </div>
+        <div class="absolute top-40 right-20 w-16 h-16 text-love-purple/20 float" style="animation-delay: 0.5s">
+            <i class="fa fa-heart text-[6rem]"></i>
+        </div>
+        <div class="absolute bottom-40 left-20 w-18 h-18 text-love-red/20 float" style="animation-delay: 1s">
+            <i class="fa fa-heart text-[7rem]"></i>
+        </div>
+        <div class="absolute bottom-20 right-40 w-14 h-14 text-love-blue/20 heart-beat" style="animation-delay: 1.5s">
+            <i class="fa fa-heart text-[5rem]"></i>
+        </div>
+    </div>
+
+    <!-- 主内容容器 -->
+    <div class="relative z-10 container mx-auto px-4 py-12 max-w-3xl">
+        <!-- 标题部分 -->
+        <header class="text-center mb-12 opacity-0 fade-in" style="animation-delay: 0.3s">
+            <h1 class="font-romantic text-[clamp(2.5rem,6vw,4rem)] font-bold text-love-dark text-shadow leading-tight">
+                致我最亲爱的人
+            </h1>
+            <div class="w-32 h-1 bg-gradient-to-r from-love-pink to-love-purple mx-auto mt-4 rounded-full"></div>
+        </header>
+
+        <!-- 主要表白内容 -->
+        <section class="bg-white/80 bg-blur rounded-2xl p-8 md:p-12 shadow-xl mb-12 transform translate-y-10 opacity-0 slide-up" style="animation-delay: 0.6s">
+            <div class="flex justify-center mb-8">
+                <div class="w-24 h-24 relative">
+                    <div class="absolute inset-0 bg-gradient-to-r from-love-pink to-love-purple rounded-full heart-beat"></div>
+                    <div class="absolute inset-1 bg-white rounded-full flex items-center justify-center">
+                        <i class="fa fa-heart text-love-red text-4xl"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="space-y-6 text-gray-700 leading-relaxed">
+                <p class="text-lg md:text-xl">亲爱的，张星玉</p>
+                
+                <p class="text-lg md:text-xl">
+                    有些情感，一旦萌生就再也无法抑制。自从遇见你，我的世界变得不一样了，每一个平凡的日子都因为有你的存在而闪耀着特别的光芒。
+                </p>
+                
+                <p class="text-lg md:text-xl">
+                    你的出现像一道光，照亮了我的生活。我总是不自觉地想起你，期待着与你相见，渴望了解你的一切。你的笑容，是我见过最美的风景。
+                </p>
+                
+                <p class="text-lg md:text-xl">
+                    今天，我鼓起所有勇气想告诉你：我喜欢你，深深的喜欢着你。我希望能有机会更靠近你，了解你，珍惜你，与你一起创造属于我们的故事。
+                </p>
+                
+                <p class="text-lg md:text-xl font-romantic text-2xl text-love-dark text-center mt-8">
+                    你愿意给我这个机会吗？
+                </p>
+            </div>
+        </section>
+
+        <!-- 互动问答部分 -->
+        <section class="bg-white/80 bg-blur rounded-2xl p-8 md:p-10 shadow-xl opacity-0 fade-in" style="animation-delay: 0.9s">
+            <h2 class="font-romantic text-[clamp(1.8rem,4vw,2.5rem)] text-center text-love-dark mb-8">请告诉我你的答案</h2>
+            
+            <div class="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10">
+                <button id="noBtn" class="px-8 py-4 bg-gray-200 text-gray-700 rounded-full text-lg font-medium shadow-md hover:bg-gray-300 transition-all duration-300 transform hover:scale-105 active:scale-95">
+                    对不起
+                </button>
+                
+                <div class="text-2xl text-gray-500 font-medium hidden md:block">
+                    还是
+                </div>
+                
+                <button id="yesBtn" class="px-10 py-4 bg-gradient-to-r from-love-pink to-love-red text-white rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 active:scale-95 heart-beat">
+                    我愿意
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="relative z-10 text-center py-6 text-gray-500 text-sm">
+        <p>用我全部的爱 &copy; 2023</p>
+    </footer>
+
+    <!-- 恶作剧弹窗 (默认隐藏) -->
+    <div id="prankModal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 transform scale-90 transition-transform duration-500">
+            <div class="text-center">
+                <div class="w-20 h-20 mx-auto mb-6 relative">
+                    <div class="absolute inset-0 bg-gradient-to-r from-prank-yellow to-prank-blue rounded-full spin-slow"></div>
+                    <div class="absolute inset-1 bg-white rounded-full flex items-center justify-center">
+                        <i class="fa fa-meh-o text-prank-yellow text-3xl"></i>
+                    </div>
+                </div>
+                
+                <h3 class="text-3xl font-bold text-prank-gray mb-4">哈哈，骗到你了！</h3>
+                
+                <p class="text-gray-700 mb-6 text-lg">
+                    其实这只是一个玩笑啦！不过看到你愿意，我还是很开心的~
+                </p>
+                
+                <div class="flex justify-center space-x-4 mb-6">
+                    <i class="fa fa-laugh-beam text-4xl text-prank-yellow animate-bounce"></i>
+                    <i class="fa fa-grin-squint text-4xl text-prank-yellow animate-bounce" style="animation-delay: 0.2s"></i>
+                    <i class="fa fa-smile-wink text-4xl text-prank-yellow animate-bounce" style="animation-delay: 0.4s"></i>
+                </div>
+                
+                <button id="closeModal" class="px-6 py-3 bg-gradient-to-r from-prank-blue to-prank-yellow text-white rounded-full font-medium shadow-md hover:shadow-lg transition-all duration-300">
+                    好吧，算你厉害
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 让"对不起"按钮逃跑的功能
+        const noBtn = document.getElementById('noBtn');
+        const yesBtn = document.getElementById('yesBtn');
+        const prankModal = document.getElementById('prankModal');
+        const closeModal = document.getElementById('closeModal');
+        
+        // 随机位置生成函数
+        function getRandomPosition() {
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            const btnWidth = 150;
+            const btnHeight = 50;
+            
+            // 确保按钮不会超出屏幕
+            const maxX = windowWidth - btnWidth - 40;
+            const maxY = windowHeight - btnHeight - 100;
+            
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+            
+            return { x: randomX, y: randomY };
+        }
+        
+        // 当鼠标悬停在"对不起"按钮上时，让它移动到随机位置
+        noBtn.addEventListener('mouseenter', () => {
+            const { x, y } = getRandomPosition();
+            noBtn.style.position = 'absolute';
+            noBtn.style.left = `${x}px`;
+            noBtn.style.top = `${y}px`;
+        });
+        
+        // 点击"我愿意"按钮显示恶作剧弹窗
+        yesBtn.addEventListener('click', () => {
+            // 先显示一个短暂的爱心动画
+            createHearts();
+            
+            // 延迟1.5秒后显示恶作剧内容
+            setTimeout(() => {
+                prankModal.classList.remove('opacity-0', 'pointer-events-none');
+                prankModal.querySelector('div').classList.remove('scale-90');
+                prankModal.querySelector('div').classList.add('scale-100');
+            }, 1500);
+        });
+        
+        // 关闭弹窗
+        closeModal.addEventListener('click', () => {
+            prankModal.classList.add('opacity-0', 'pointer-events-none');
+            prankModal.querySelector('div').classList.remove('scale-100');
+            prankModal.querySelector('div').classList.add('scale-90');
+        });
+        
+        // 创建短暂的爱心动画
+        function createHearts() {
+            const colors = ['#FF7EB3', '#FF3A6E', '#C82E5C', '#A77DC2', '#7B61FF'];
+            
+            for (let i = 0; i < 30; i++) {
+                const heart = document.createElement('div');
+                heart.innerHTML = '<i class="fa fa-heart"></i>';
+                heart.className = 'fixed text-2xl pointer-events-none';
+                heart.style.color = colors[Math.floor(Math.random() * colors.length)];
+                heart.style.left = `${Math.random() * 100}vw`;
+                heart.style.top = `${Math.random() * 100}vh`;
+                heart.style.opacity = Math.random() * 0.8 + 0.2;
+                heart.style.animation = `float ${Math.random() * 2 + 1}s ease-in-out forwards`;
+                heart.style.transform = `rotate(${Math.random() * 40 - 20}deg)`;
+                heart.style.zIndex = '60';
+                heart.style.animationDelay = `${Math.random() * 1}s`;
+                
+                document.body.appendChild(heart);
+                
+                // 短暂时间后移除爱心
+                setTimeout(() => {
+                    heart.remove();
+                }, 1500);
+            }
+        }
+        
+        // 页面滚动时的视差效果
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            const hearts = document.querySelectorAll('.fa-heart.text-[5rem], .fa-heart.text-[6rem], .fa-heart.text-[7rem], .fa-heart.text-[8rem]');
+            
+            hearts.forEach((heart, index) => {
+                heart.style.transform = `translateY(${scrollY * 0.05 * (index % 2 === 0 ? 1 : -1)}px)`;
+            });
+        });
+    </script>
+</body>
+</html>
+    
