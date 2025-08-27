@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时光相册 - 合集</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- 配置Tailwind自定义颜色和字体 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#f97316',
+                        secondary: '#1e40af',
+                        neutral: {
+                            100: '#f5f5f5',
+                            200: '#e5e5e5',
+                            800: '#262626',
+                            900: '#171717',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .collection-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 2rem;
+            }
+            .photo-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 1.5rem;
+            }
+        }
+    </style>
+    
+    <style>
+        .fade-in {
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        .loader {
+            border-top-color: #f97316;
+            animation: spinner 0.8s linear infinite;
+        }
+        
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .upload-area {
+            transition: all 0.3s ease;
+        }
+        
+        .upload-area.drag-over {
+            background-color: rgba(249, 115, 22, 0.1);
+            border-color: #f97316;
+        }
+    </style>
+</head>
+
+<body class="bg-neutral-100 text-neutral-800">
+    <!-- 导航栏 -->
+    <header id="navbar" class="fixed w-full z-50 bg-white/80 backdrop-blur transition-all duration-300">
+        <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-primary">
+                <i class="fa fa-heart mr-2"></i>时光相册
+            </h1>
+            
+            <div class="hidden md:flex space-x-8">
+                <a href="#collections" class="hover:text-primary transition-colors">合集</a>
+                <a href="#create-collection" class="hover:text-primary transition-colors">新建合集</a>
+            </div>
+            
+            <button id="menuBtn" class="md:hidden text-2xl">
+                <i class="fa fa-bars"></i>
+            </button>
+        </nav>
+        
+        <div id="mobileMenu" class="md:hidden hidden bg-white shadow-lg">
+            <div class="container mx-auto px-4 py-4 flex flex-col space-y-4">
+                <a href="#collections" class="hover:text-primary transition-colors py-2">合集</a>
+                <a href="#create-collection" class="hover:text-primary transition-colors py-2">新建合集</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 合集列表区域 -->
+    <section id="collections" class="py-24 bg-white pt-32">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold mb-4">我的合集</h2>
+                <p class="text-neutral-600 max-w-2xl mx-auto">每个合集都有自己的故事，点击进入查看更多精彩瞬间。</p>
+            </div>
+            
+            <div class="collection-grid" id="collectionsGrid">
+                <!-- 合集将通过JS动态生成 -->
+            </div>
+            
+            <div id="noCollections" class="text-center py-16 hidden">
+                <i class="fa fa-folder-open text-6xl text-neutral-300 mb-4"></i>
+                <h3 class="text-xl font-medium mb-2">还没有创建任何合集</h3>
+                <p class="text-neutral-500 mb-6">点击下方按钮创建你的第一个合集吧</p>
+                <button id="createFirstCollection" class="bg-primary hover:bg-primary/90 text-white font-medium py-2 px-6 rounded-full transition-colors">
+                    创建合集
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 创建合集区域 -->
+    <section id="create-collection" class="py-20 bg-neutral-100">
+        <div class="container mx-auto px-4">
+            <div class="max-w-2xl mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold mb-4">创建新合集</h2>
+                    <p class="text-neutral-600">创建一个新的照片合集，记录特定的美好时光。</p>
+                </div>
+                
+                <div class="bg-white rounded-2xl p-8 shadow-md">
+                    <form id="createCollectionForm" class="space-y-6">
+                        <div>
+                            <label for="collectionName" class="block text-sm font-medium text-neutral-700 mb-1">合集名称 <span class="text-red-500">*</span></label>
+                            <input type="text" id="collectionName" class="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" placeholder="例如：旅行记忆、生日派对">
+                            <p id="nameError" class="text-red-500 text-sm mt-1 hidden">请输入合集名称</p>
+                        </div>
+                        
+                        <div>
+                            <label for="collectionDescription" class="block text-sm font-medium text-neutral-700 mb-1">合集描述</label>
+                            <textarea id="collectionDescription" rows="3" class="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" placeholder="描述一下这个合集的内容..."></textarea>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-neutral-700 mb-2">选择封面照片（可选）</label>
+                            <div class="upload-area border-2 border-dashed border-neutral-300 rounded-xl p-6 text-center" id="collectionCoverArea">
+                                <input type="file" id="collectionCoverInput" accept="image/*" class="hidden">
+                                <label for="collectionCoverInput" class="cursor-pointer">
+                                    <i class="fa fa-image text-4xl text-primary mb-3"></i>
+                                    <p class="text-neutral-700">点击上传封面照片</p>
+                                    <p class="text-neutral-500 text-sm mt-1">支持 JPG, PNG 格式</p>
+                                </label>
+                            </div>
+                            <div id="collectionCoverPreview" class="mt-4 hidden">
+                                <img id="coverPreviewImg" src="" alt="封面预览" class="max-h-40 rounded-lg border border-neutral-200">
+                                <button type="button" id="removeCover" class="text-red-500 text-sm mt-2 hover:underline">移除封面</button>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button type="button" id="createBtn" class="px-8 py-3 bg-primary text-white rounded-full hover:bg-primary/90 transition-colors font-medium inline-flex items-center">
+                                <i class="fa fa-plus mr-2"></i> 创建合集
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 合集详情模态框 -->
+    <div id="collectionModal" class="fixed inset-0 z-50 bg-black/70 flex items-start pt-16 justify-center hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col w-full mx-4">
+            <div class="p-6 border-b border-neutral-200 flex justify-between items-center sticky top-0 bg-white z-10">
+                <div>
+                    <h3 id="modalCollectionName" class="text-2xl font-bold"></h3>
+                    <p id="modalCollectionDescription" class="text-neutral-500 text-sm mt-1"></p>
+                </div>
+                <div class="flex space-x-3">
+                    <button id="closeCollectionModal" class="text-neutral-500 hover:text-neutral-800 text-xl">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="p-6 overflow-y-auto flex-grow">
+                <!-- 上传照片区域 -->
+                <div class="upload-area border-2 border-dashed border-neutral-300 rounded-xl p-6 text-center mb-8" id="collectionUploadArea">
+                    <input type="file" id="collectionPhotoInput" accept="image/*" multiple class="hidden">
+                    <label for="collectionPhotoInput" class="cursor-pointer">
+                        <i class="fa fa-cloud-upload text-5xl text-primary mb-4"></i>
+                        <p class="text-lg mb-2">点击或拖拽照片到这里上传</p>
+                        <p class="text-neutral-500 text-sm">支持 JPG, PNG 格式，可批量上传</p>
+                    </label>
+                </div>
+                
+                <!-- 照片网格 -->
+                <h4 class="text-lg font-medium mb-4">照片 (<span id="collectionPhotoCount">0</span>)</h4>
+                <div class="photo-grid" id="collectionPhotosGrid">
+                    <!-- 照片将通过JS动态生成 -->
+                </div>
+                
+                <div id="noPhotosInCollection" class="text-center py-16 hidden">
+                    <i class="fa fa-camera text-6xl text-neutral-300 mb-4"></i>
+                    <h3 class="text-xl font-medium mb-2">这个合集还没有照片</h3>
+                    <p class="text-neutral-500">上传一些照片来丰富这个合集吧</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 消息提示框 -->
+    <div id="toast" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-neutral-800 text-white px-6 py-3 rounded-full shadow-lg opacity-0 transition-opacity duration-300 flex items-center z-50">
+        <i class="fa fa-check-circle mr-2"></i>
+        <span id="toastMessage"></span>
+    </div>
+
+    <script>
+        // 数据存储
+        let collections = [];
+        let currentCollectionId = null;
+        let currentPhotos = [];
+        
+        // DOM元素
+        const collectionsGrid = document.getElementById('collectionsGrid');
+        const noCollections = document.getElementById('noCollections');
+        const createCollectionForm = document.getElementById('createCollectionForm');
+        const collectionName = document.getElementById('collectionName');
+        const collectionDescription = document.getElementById('collectionDescription');
+        const collectionCoverInput = document.getElementById('collectionCoverInput');
+        const collectionCoverPreview = document.getElementById('collectionCoverPreview');
+        const coverPreviewImg = document.getElementById('coverPreviewImg');
+        const removeCover = document.getElementById('removeCover');
+        const nameError = document.getElementById('nameError');
+        const createBtn = document.getElementById('createBtn');
+        const createFirstCollection = document.getElementById('createFirstCollection');
+        const collectionModal = document.getElementById('collectionModal');
+        const modalCollectionName = document.getElementById('modalCollectionName');
+        const modalCollectionDescription = document.getElementById('modalCollectionDescription');
+        const collectionPhotosGrid = document.getElementById('collectionPhotosGrid');
+        const noPhotosInCollection = document.getElementById('noPhotosInCollection');
+        const collectionPhotoCount = document.getElementById('collectionPhotoCount');
+        const collectionPhotoInput = document.getElementById('collectionPhotoInput');
+        const collectionUploadArea = document.getElementById('collectionUploadArea');
+        const closeCollectionModal = document.getElementById('closeCollectionModal');
+        const menuBtn = document.getElementById('menuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        // 初始化
+        function init() {
+            // 从本地存储加载数据
+            loadData();
+            // 渲染合集列表
+            renderCollections();
+            // 绑定事件（关键修复点）
+            bindEvents();
+        }
+        
+        // 从本地存储加载数据
+        function loadData() {
+            try {
+                const savedCollections = localStorage.getItem('albumCollections');
+                collections = savedCollections ? JSON.parse(savedCollections) : [];
+            } catch (e) {
+                console.error('加载数据失败:', e);
+                collections = [];
+            }
+        }
+        
+        // 保存数据到本地存储
+        function saveData() {
+            try {
+                localStorage.setItem('albumCollections', JSON.stringify(collections));
+            } catch (e) {
+                console.error('保存数据失败:', e);
+                showToast('数据保存失败', 'error');
+            }
+        }
+        
+        // 生成唯一ID
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+        }
+        
+        // 渲染合集列表
+        function renderCollections() {
+            if (collections.length === 0) {
+                collectionsGrid.innerHTML = '';
+                noCollections.classList.remove('hidden');
+                return;
+            }
+            
+            noCollections.classList.add('hidden');
+            collectionsGrid.innerHTML = '';
+            
+            collections.forEach(collection => {
+                const collectionCard = document.createElement('div');
+                collectionCard.className = 'relative rounded-xl overflow-hidden shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer fade-in';
+                collectionCard.setAttribute('data-id', collection.id);
+                
+                // 随机选择封面照片
+                let coverSrc = collection.cover || 'https://picsum.photos/id/1068/600/400';
+                if (collection.photos && collection.photos.length > 0) {
+                    const randomPhoto = collection.photos[Math.floor(Math.random() * collection.photos.length)];
+                    coverSrc = randomPhoto.src;
+                }
+                
+                collectionCard.innerHTML = `
+                    <img src="${coverSrc}" alt="${collection.name}" class="w-full h-64 object-cover">
+                    <div class="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-black/70 to-transparent">
+                        <h3 class="text-xl font-bold text-white">${collection.name}</h3>
+                        <p class="text-white/90 text-sm">${collection.photos ? collection.photos.length : 0} 张照片</p>
+                    </div>
+                `;
+                
+                collectionsGrid.appendChild(collectionCard);
+                
+                // 点击进入合集
+                collectionCard.addEventListener('click', () => {
+                    openCollection(collection.id);
+                });
+            });
+        }
+        
+        // 打开合集详情
+        function openCollection(id) {
+            const collection = collections.find(c => c.id === id);
+            if (!collection) return;
+            
+            currentCollectionId = id;
+            currentPhotos = collection.photos || [];
+            
+            modalCollectionName.textContent = collection.name;
+            modalCollectionDescription.textContent = collection.description || '无描述';
+            
+            renderCollectionPhotos();
+            
+            // 显示模态框
+            collectionModal.classList.remove('hidden');
+            setTimeout(() => {
+                collectionModal.classList.add('opacity-100');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // 渲染合集中的照片
+        function renderCollectionPhotos() {
+            if (currentPhotos.length === 0) {
+                collectionPhotosGrid.innerHTML = '';
+                noPhotosInCollection.classList.remove('hidden');
+                collectionPhotoCount.textContent = '0';
+                return;
+            }
+            
+            noPhotosInCollection.classList.add('hidden');
+            collectionPhotosGrid.innerHTML = '';
+            collectionPhotoCount.textContent = currentPhotos.length;
+            
+            currentPhotos.forEach((photo, index) => {
+                const photoItem = document.createElement('div');
+                photoItem.className = 'rounded-xl overflow-hidden shadow-md hover:translate-y-[-5px] transition-all duration-300';
+                
+                photoItem.innerHTML = `
+                    <div class="relative aspect-square overflow-hidden">
+                        <img src="${photo.src}" alt="${photo.title}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-3">
+                        <h4 class="font-medium text-sm">${photo.title}</h4>
+                    </div>
+                `;
+                
+                collectionPhotosGrid.appendChild(photoItem);
+            });
+        }
+        
+        // 创建新合集（关键修复点）
+        function createCollection() {
+            // 验证表单
+            const name = collectionName.value.trim();
+            if (!name) {
+                nameError.classList.remove('hidden');
+                collectionName.classList.add('border-red-500');
+                return;
+            }
+            
+            // 隐藏错误提示
+            nameError.classList.add('hidden');
+            collectionName.classList.remove('border-red-500');
+            
+            // 获取表单数据
+            const description = collectionDescription.value.trim();
+            let coverSrc = null;
+            if (coverPreviewImg.src && coverPreviewImg.src !== window.location.href) {
+                coverSrc = coverPreviewImg.src;
+            }
+            
+            // 禁用按钮防止重复提交
+            createBtn.disabled = true;
+            createBtn.innerHTML = '<div class="loader w-5 h-5 border-2 border-white rounded-full inline-block mr-2"></div> 创建中...';
+            
+            // 创建新合集
+            const newCollection = {
+                id: generateId(),
+                name: name,
+                description: description,
+                cover: coverSrc || 'https://picsum.photos/id/1068/600/400',
+                photos: []
+            };
+            
+            collections.push(newCollection);
+            saveData();
+            
+            // 重置表单
+            setTimeout(() => {
+                createCollectionForm.reset();
+                collectionCoverPreview.classList.add('hidden');
+                coverPreviewImg.src = '';
+                
+                // 恢复按钮状态
+                createBtn.disabled = false;
+                createBtn.innerHTML = '<i class="fa fa-plus mr-2"></i> 创建合集';
+                
+                // 刷新合集列表
+                renderCollections();
+                
+                // 显示成功提示
+                showToast('合集创建成功');
+                
+                // 打开新创建的合集
+                setTimeout(() => {
+                    openCollection(newCollection.id);
+                }, 500);
+            }, 600);
+        }
+        
+        // 向合集中添加照片
+        function addPhotosToCollection(photos) {
+            const collectionIndex = collections.findIndex(c => c.id === currentCollectionId);
+            if (collectionIndex === -1) return;
+            
+            const newPhotos = photos.map(photoSrc => ({
+                id: generateId(),
+                src: photoSrc,
+                title: '未命名照片',
+                date: new Date().toISOString()
+            }));
+            
+            if (!collections[collectionIndex].photos) {
+                collections[collectionIndex].photos = [];
+            }
+            collections[collectionIndex].photos.push(...newPhotos);
+            
+            // 如果是第一个照片，设置为封面
+            if (collections[collectionIndex].photos.length === newPhotos.length) {
+                collections[collectionIndex].cover = newPhotos[0].src;
+            }
+            
+            saveData();
+            currentPhotos = collections[collectionIndex].photos;
+            renderCollectionPhotos();
+            
+            showToast(`已添加 ${newPhotos.length} 张照片`);
+        }
+        
+        // 消息提示
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            const icon = toast.querySelector('i');
+            
+            toastMessage.textContent = message;
+            
+            if (type === 'error') {
+                icon.className = 'fa fa-exclamation-circle mr-2';
+                toast.classList.add('bg-red-600');
+                toast.classList.remove('bg-neutral-800');
+            } else {
+                icon.className = 'fa fa-check-circle mr-2';
+                toast.classList.add('bg-neutral-800');
+                toast.classList.remove('bg-red-600');
+            }
+            
+            toast.style.opacity = '1';
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+            }, 3000);
+        }
+        
+        // 处理文件预览
+        function handleFilePreview(file, callback) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                callback(e.target.result);
+            }
+            reader.readAsDataURL(file);
+        }
+        
+        // 绑定所有事件（关键修复点）
+        function bindEvents() {
+            // 移动端菜单
+            menuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                const icon = menuBtn.querySelector('i');
+                if (mobileMenu.classList.contains('hidden')) {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                } else {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                }
+            });
+            
+            // 创建第一个合集按钮
+            createFirstCollection.addEventListener('click', () => {
+                document.getElementById('create-collection').scrollIntoView({ behavior: 'smooth' });
+                setTimeout(() => {
+                    collectionName.focus();
+                }, 500);
+            });
+            
+            // 封面预览
+            collectionCoverInput.addEventListener('change', (e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                    handleFilePreview(e.target.files[0], (src) => {
+                        coverPreviewImg.src = src;
+                        collectionCoverPreview.classList.remove('hidden');
+                    });
+                }
+            });
+            
+            // 移除封面
+            removeCover.addEventListener('click', () => {
+                coverPreviewImg.src = '';
+                collectionCoverPreview.classList.add('hidden');
+                collectionCoverInput.value = '';
+            });
+            
+            // 关键修复：使用click事件而不是submit事件
+            createBtn.addEventListener('click', createCollection);
+            
+            // 关闭合集模态框
+            closeCollectionModal.addEventListener('click', () => {
+                collectionModal.classList.remove('opacity-100');
+                setTimeout(() => {
+                    collectionModal.classList.add('hidden');
+                    document.body.style.overflow = '';
+                    renderCollections();
+                }, 300);
+            });
+            
+            // 合集内上传照片
+            collectionPhotoInput.addEventListener('change', (e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                    const files = Array.from(e.target.files);
+                    const previewUrls = [];
+                    
+                    files.forEach(file => {
+                        if (file.type.match('image.*')) {
+                            handleFilePreview(file, (src) => {
+                                previewUrls.push(src);
+                                if (previewUrls.length === files.length) {
+                                    addPhotosToCollection(previewUrls);
+                                }
+                            });
+                        }
+                    });
+                    
+                    e.target.value = '';
+                }
+            });
+            
+            // 点击上传区域触发文件选择
+            collectionUploadArea.addEventListener('click', () => {
+                collectionPhotoInput.click();
+            });
+        }
+        
+        // 页面加载完成后初始化
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
+    
